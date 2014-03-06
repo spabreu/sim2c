@@ -1,0 +1,122 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Basic types.
+%
+
+%
+% Stream coordinates.
+
+position(Line : integer, Col : integer).
+range(Begin : position, End : position).
+
+%
+% Identifiers.
+
+idList.
+	[Name:id, Next:idList] >> idList.
+	[] >> idList.
+
+id(Name : string).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Type expressions.
+%
+
+type(Storage).
+
+	simpleType >> type.
+		numType >> simpleType.
+			intType  >> numType(storage = 4).
+			realType >> numType(storage = 4).
+		boolType >> simpleType(storage = 1).
+		voidType >> simpleType(storage = 1).
+
+	mapType(Domain : typeList, Range : typeList) >> type.
+
+	arrayType(Size : int, ElemType : type) >> type.
+
+	classType(Decls : declList) >> type.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Expressions.
+%
+
+exp(Value, Type : type) << ReadOnly : boolean >> .
+
+	expList >> exp.
+		expPair(Head : exp, Tail : expList) >> expList.
+		expVoid >> expList.
+
+	valueExp << ReadOnly = true >> exp.
+		opExp(Op : op) >> valueExp.
+			unExp(Arg : exp) >> opExp.
+				
+			binExp(Arg1 : exp, Arg2 : exp) >> opExp.
+		litExp >> valueExp.
+			intLit(Value : int) >> litExp.
+			realLit(Value : real) >> litExp.
+			boolLit(Value : bool) >> litExp.
+			arrayLit(NElem : int, Value : expList) >> litExp.
+			mapLit(Formals : declList, Body : stat) >> litExp.
+			classLit(Formals : declList, Body : stat) >> litExp.
+
+% mapExp() includes array expressions
+	mapExp(Fun : exp, Args : expList) >> exp.
+
+	idExp(Id : id) >> exp.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Statements.
+%
+
+stat << Where : lc >> .
+
+	statList >> stat.
+		statPair(Head : stat, Tail : statList) >> statList.
+		statVoid >> statList.
+
+	declStat(Decl : decl) >> stat.
+
+	operStat >> stat.
+		assignStat(LValue : exp, RValue : exp) >> operStat.
+		funCallStat(Fun : exp, Args : expList) >> operStat.
+
+	controlStat >> stat.
+		condStat(Clauses : clauses) >> controlStat.
+		whileStat(Clauses : clauses) >> controlStat.
+		returnStat(Value : exp) >> controlStat.
+
+
+%
+% Clauses for conditional statements.
+
+clauses << Where : lc >> .
+	condClause(Cond : exp, Body : stat, Next : clauses) >> clauses.
+	elseClause(Body : stat) >> clauses.
+	voidClause >> clauses.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Declarations.
+%
+
+
+declList.
+	declPair(Head : decl, Tail : declList) >> declList.
+	declVoid >> declList.
+
+decl(Names : idList, Type : type).
+	constDecl(Value : exp) >> decl.
+	varDecl >> decl.
+		initVarDecl(Value : exp) >> varDecl.
+	typeDecl >> decl.
+
+
+formalList.
+	formalPair(Head : formal, Tail : formalList) >> formalList.
+	formalVoid >> formalList.
+
+formal(Names : idList, Type : Type).

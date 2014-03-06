@@ -1,0 +1,52 @@
+_Tail ==> [[]|_Tail].
+_Tail ==> [[]|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [lit(string, 'Hi there.
+')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('more')|_Tail].
+_Tail ==> [lit(bool, true)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [1|_Tail].
+_Tail ==> [id('more')|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [lit(string, '? ')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('s')|_Tail].
+_Tail ==> [id('readString')|_Tail].
+_Tail ==> [[]|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [lit(string, 'You typed: "')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [id('s')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [lit(string, '".
+')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('more')|_Tail].
+_Tail ==> [id('s')|_Tail].
+_Tail ==> [lit(string, '')|_Tail].
+[B,A|_Tail] ==> [ne(A,B)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[S,E|_Tail] ==> [[clause(E, S)]|_Tail].
+[B,G|_Tail] ==> [while(B, G)|_Tail].
+_Tail ==> [id('writeString')|_Tail].
+_Tail ==> [lit(string, 'See you around.
+')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[S,TR,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('program'), const(V), T)|_Tail].

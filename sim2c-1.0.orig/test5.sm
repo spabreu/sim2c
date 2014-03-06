@@ -1,0 +1,49 @@
+.text
+plus:
+	push	0
+	link
+	push	2
+	local
+	load
+	push	1
+	local
+	load
+	add
+	push	3
+	local
+	store
+	unlink
+	jump
+
+program:
+        push	0
+        link
+	push	0		# reserva espaço para retorno de read_int
+        push	read_int
+        call
+#
+	dup
+	push	print_int
+	call
+	pop
+#
+	push	3
+	mul
+#
+	dup
+	push	print_int
+	call
+	pop
+#
+	push	0		# reserva espaço para retorno de plus
+	swap			# repõe o outro no topo
+        push 	2
+	push	plus
+	call
+	pop			# retira argumento
+	pop			# retira argumento
+	push	print_int
+	call
+	pop
+	unlink
+	jump

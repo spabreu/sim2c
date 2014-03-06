@@ -1,0 +1,355 @@
+\documentclass[a4paper]{article}
+
+\usepackage{pslatex}
+\usepackage{a4wide}
+\usepackage{isolatin1}
+\usepackage[portuges]{babel}
+\usepackage{picins}
+\usepackage{hyperref}
+
+\defõ{\~o}
+\defÕ{\~O}
+
+\begin{document}
+
+% $Id: apt-vspl.tex,v 1.2 2010/03/26 07:35:57 spa Exp spa $
+
+\def\LANG{\textsf{VSPL}}
+
+\begin{center}
+  \begin{Large}
+    \textsf{Compiladores -- Ano lectivo 2009/10} \\
+    \textbf{Acerca da representação para a APT na Linguagem \LANG} \\
+  \end{Large}
+  \mbox{}\\
+  \hrulefill{}
+  \begin{center}
+    Informação de versão: \verb$Id: apt-vspl.tex,v 1.2 2010/03/26 07:35:57 spa Exp spa $
+  \end{center}
+\end{center}
+
+\noindent \hrulefill{} {\Large Especificação} \hrulefill{}
+
+\noindent
+Na construção da árvore abstracta para um programa em \LANG, é
+necessário ter em conta a estrutura concreta da gramática utilizada
+para construir o parser.  No entanto, e como um dos objectivos da
+noção de sintaxe \emph{abstracta} é o de ``suavizar'' a sintaxe
+concreta, é possível definir alguns critérios gerais para elaboração
+da sintaxe abstracta.  Estes irão incorporar alguns aspectos da
+semântica pretendida para a linguagem.
+
+\noindent \mbox{} \hrulefill{} \mbox{}
+
+\vspace{0.4cm}
+\noindent
+Este documento pretende apresentar critérios para compôr a sintaxe
+abstracta para uma linguagem de programação.  É aplicada ao \LANG{}
+mas pode ser adaptada a outras linguagens duma forma simples.
+
+Na secção~\ref{sec:principios-gerais} são apresentados princípios
+orientadores para a resolução deste tipo de problema.  Na
+secção~\ref{sec:literais} descreve-se abordagens à representação de
+literais.  Na secção~\ref{sec:expressoes} as expressões (aritméticas,
+nomeadamente) são descritas e na secção~\ref{sec:statements} é
+abordada a problemática da representação das instruções
+(``statements'').
+
+\section{Princípios Gerais}
+\label{sec:principios-gerais}
+
+Embora se trate de especificar uma estrutura capaz de exprimir um
+programa, com uma sintaxe simplificada, muitos aspectos importantes
+para fases posteriores do processo de compilação serão omitidos ao
+nível da APT, são estes nomeadamente:
+\begin{itemize}
+\item A informação de tipo associada a qualquer expressão ou nome.
+\item A informação de âmbito (``scope'') associada aos nomes.
+\end{itemize}
+Estes aspectos só deverão ser contemplados posteriormente, na fase de
+análise semântica (análise de nomes e de tipos).
+
+Por ter sido estipulado que as fases de análise semântica e
+posteriores seriam implementadas numa linguagem de Programação em
+Lógica com Restrições (\emph{Constraints}), torna-se importante
+adequar as características da APT ao modelo computacional subjacente.
+Assim, para beneficiar plenamente das capacidades dos mecanismos de
+Unificação e Constraints, importa especificar cuidadosamente a
+estrutura da APT por forma a criar oportunidades de factorizar a
+representação sempre que isto se mostre benéfico.
+
+\section{Tipos}
+\label{sec:tipos}
+
+Quando for preciso representar um tipo, utiliza-se um termo.  Os
+termos associados aos tipos do \LANG{} restrito são:
+\begin{description}
+\item[\texttt{int}] Um inteiro.
+\item[\texttt{bool}] Um booleano.
+\item[\texttt{array(TYPE, DIM)}] Um array (vector) do tipo
+  \texttt{TYPE} com \texttt{DIM} (uma expressão inteira) elementos.
+\item[\texttt{pair(TYPE1, TYPE2)}] Um par de tipos.
+\item[\texttt{tuple([T1,T2,..Ts])}] Uma lista de tipos, representando
+  um tuplo.
+\end{description}
+
+\section{Literais}
+\label{sec:literais}
+
+Os literais que ocorrem na linguagem \LANG{} restrita são:
+\begin{itemize}
+\item As constantes inteiras,
+%\item As constantes em vírgula flutuante,
+\item As constantes booleanas,
+\item Os literais de tipos compostos que incluem os tuplos, os \emph{arrays},
+  % os literais de classe,
+\item Os literais funcionais.
+\end{itemize}
+Para agrupar estas formas de literal, convém definir uma estrutura comum capaz
+de as representar todas.  Uma possível representação seria:
+\begin{center}
+  \verb+lit(TYPE, VALUE)+
+\end{center}
+Em que \verb+TYPE+ é um átomo com a representação do tipo de literal
+que está a ser representado e \verb+VALUE+ uma sua representação, com
+uma estrutura adequada ao tipo.  Por exemplo, poderiamos ter:
+\begin{description}
+
+\item[\texttt{lit(int, 3)}] \mbox{} \\ Para a constante inteira 3.
+
+\item[\texttt{lit(pair(int, pair(bool, int)), V)}] \mbox{} \\
+  Em que \textbf{\texttt{V = pair(lit(int, 2), pair(lit(bool, true),
+      lit(int, 4)))}}, para o literal de tuplo \textbf{\texttt{(2,
+      true, 4)}}, que é entendido como \textbf{\texttt{(2, (true,
+      4))}}.
+
+\item[\texttt{lit(tuple([int, bool, int]), [lit(int, 2), lit(bool,
+    true), lit(int, 4)])}] %
+  %\mbox{} \\
+  Para o mesmo literal, mas neste caso a estrutura foi ``linearizada''
+  pois ficámos com um triplo expresso como uma lista Prolog e não uma
+  árvore.  Esta representação é alternativa à anterior e, embora possa
+  ser mais trabalhosa de obter, é conveniente por ser pouco profunda.
+
+\item[\texttt{lit(map(ARGT, VALT), VALOR)}] \mbox{} \\ Para um literal
+  funcional.  Note-se que, neste caso, o tipo de literal é muito
+  simplificado pois ainda não inclui informação explícita sobre o tipo
+  concreto do literal: este está por agora no valor associado e
+  possívelmente só poderá ser determinado completamente após a análise
+  de nomes e de tipos.  Só quando isto tiver sido feito é que
+  \texttt{ARGT} e \texttt{VALT} poderão tomar valores.
+  
+  Também acerca deste exemplo concreto, não é dado mais detalhe sobre o valor
+  associado pois este requer que tenham sido definidas as representações para
+  expressões (secção~\ref{sec:expressoes}) e para as instruções ou
+  ``statements'' (secção~\ref{sec:expressoes}).
+  
+\item[\texttt{lit(array(T,NUM), VALOR)}] \mbox{} \\ Para um literal de
+  array.  Tal como no caso anterior, muita da informação sobre o
+  literal (nomeadamente a conducente à determinação do tipo do
+  literal) está contida no argumento \texttt{VALOR} e só depois de
+  alguma análise (p/ex a travessia de \texttt{VALOR}) é que se podem
+  concretizar \texttt{T} e \texttt{NUM}.
+
+\end{description}
+Atenção que o tipo referido no termo \texttt{lit} começa por ser uma
+especificação de tipo \emph{incompleta}, no sentido dos tipos do
+\LANG{}.  O papel de determinar o tipo exacto do literal (assim como
+das expressões) pertence a uma fase posterior da compilação, designada
+por \emph{análise de tipos.}
+
+\section{Expressões}
+\label{sec:expressoes}
+
+No tocante a expressões há muitas formas viáveis de as representar usando
+termos Prolog.  Uma primeira escolha consiste em determinar se se agrupam
+todas as expressões sob uma representação comum ou se se deixa que cada
+expressão seja distinta das restantes, imediatamente ao nível superficial.
+Assim, estariam em confronto as seguintes\footnote{Claro que esta enumeração
+  não é exaustiva, pretende apenas sugerir formas diferentes de representar
+  expressões focando alguns dos aspectos próprios a cada uma.} representações,
+por exemplo para a expressão \texttt{2+a}:
+\begin{description}
+
+\item[\texttt{expr(add, expr(lit(int, 2)), expr(name(a)))}] \mbox{} \\ Nesta
+  representação, uma expressão é dada por um termo \texttt{expr/3}, em que o
+  primeiro argumento indica a operação e os restantes os seus operandos, sendo
+  estes forçosamente coagidos a serem representados como uma expressão.
+
+\item[\texttt{add(lit(int, 2), name(a))}] \mbox{} \\ Esta abordagem simplifica
+  em larga medida a anterior, não tornando explícito que se trata duma
+  expressão mas transmitindo essa informação implícitamente pelo contexto em
+  que se insere.
+
+\item[\texttt{binop(add, lit(int, 2), name(a))}] \mbox{} \\ Esta representação
+  é bastante próxima da anterior mas foca o facto da expressão em causa ser a
+  aplicação dum operador binário (daí o functor principal ser
+  \texttt{binop/3}), deixando para o papel de argumento a especificação da
+  operação concreta a usar.
+  
+\item[\fbox{\texttt{op(add, lit(int, 2), name(a))}}] \mbox{} \\ É uma
+  representação que coincide com a anterior mas que se adequa mais à
+  filosofia do Prolog no sentido em que um termo composto é
+  caracterizado pelo par (functor, aridade) e não só pelo functor, o
+  que permite que se distingam fácilmente por exemplo \texttt{op/3}
+  para operadores binários de \texttt{op/2} para operadores unários.
+
+\end{description}
+Qual a melhor?  Esta pergunta não tem resposta muito clara, pelo que a
+decisão ficará à escolha de quem tiver de implementar procedimentos
+que actuem sobre estas estruturas de dados.  Dado que procuramos ter
+alguma interoperabilidade entre trabalhos de diversos grupos, temos de
+assentar numa representação: será a última.
+
+Note-se que a distinção entre \texttt{primary} e \texttt{expr}
+desaparece nesta APT, pois a função desta distinção (e da introdução
+do não-terminal \texttt{primary}) era exclusivamente de restringir
+sintacticamente o conjunto de programas aceitáveis.
+
+\section{Instruções}
+\label{sec:statements}
+
+Tal como para as expressões, a multiplicidade de abordagens possíveis é vasta.
+As questões que se colocam são as mesmas, na sua essência, pelo que nos
+limitamos a apresentar algumas possibilidades sem preferir nenhuma às
+restantes.  Os exemplos são excertos de código \LANG{}, nos quais se focam os
+aspectos relativos ao uso de diferentes instruções (``statements'').
+
+
+\subsection{Exemplo}
+\label{sec:exemplo-statement}
+
+Supondo que estamos a representar a instrução em \LANG{} dada pelo segmento de
+programa expresso na figura~\ref{fig:ex-apt-statement}, poderemos recorrer às
+seguintes representações:
+\begin{center}
+  \begin{figure}[htbp]
+    \centering
+\begin{verbatim}
+                              [ a := 2;
+                                * [ a < 10 -> a := a+1 ] ]
+\end{verbatim}
+    \caption{Exemplo de código para as instruções (``statements'')}
+    \label{fig:ex-apt-statement}
+  \end{figure}
+\end{center}
+Existem várias formas de representar este fragmento de programa,
+aquela que optamos por usar é esta:
+\begin{description}
+  
+\item[\texttt{[assign(name(a), lit(int, 2)), while(CLAUSES)]}] \mbox{} \\ Para
+  representar a sequência de instruções usou-se uma \emph{lista} nativa do
+  Prolog.  Para as restantes instruções usaram-se convenções ``minimalistas''
+  semelhantes à usada para os literais, como os que ocorrem neste exemplo.
+  
+  Por exemplo, o elemento \texttt{CLAUSES} que aparece poderá ser
+  representado por:
+  
+\item[\texttt{CLAUSES=[clause(op(lt, name(a), lit(int, 10)), STMT)]}]
+  \mbox{} \\ Note-se que \texttt{CLAUSES} é uma lista, embora neste
+  caso só com um elemento.  Também o termo \texttt{clause/2} tem como
+  primeiro argumento uma expressão (a guarda) que deverá ser booleana
+  e como segundo argumento uma instrução (statement):
+  
+\item[\texttt{STMT=assign(name(a), op(add, name(a), lit(int, 1)))}]
+  \mbox{} \\ Finalmente, o segundo subtermo de \texttt{CLAUSES} é
+  descrito: tem a estrutura duma instrução (statement.)
+
+\end{description}
+
+
+\subsection{Enumeração de statements}
+\label{sec:enum-de-stat}
+
+Concretamente, os tipos de nó de APT para \LANG{} que iremos utilizar
+ao longo da disciplina são estes:
+\begin{description}
+\item[\texttt{decl(NAME, TYPE, VALUE)}] \mbox{} \\ Em que NAME é da
+  forma \texttt{name(NOME)} e NOME é um átomo, \texttt{TYPE} é uma
+  expressão de tipo (como na secção~\ref{sec:tipos}).
+  
+\item[\texttt{assign(EXPR, EXPR)}] \mbox{} \\ Uma afectação, em que a
+  primeira expressão deverá ser um \emph{primário} e a segunda não
+  terá restrições.  Note-se que neste caso deixa de haver distinção
+  estrutural entre o primeiro e segundo argumentos: sabemos (pela
+  análise sintactica) que o primeiro elemento tem um domínio muito
+  mais restrito (o dos primários), embora isso não se reflicta aqui.
+  
+\item[\texttt{funcall(EXPR, EXPR)}] \mbox{} \\ Uma chamada de função,
+  como expressão.  As mesmas observações que para a afectação são aqui
+  aplicáveis.
+
+\item[\texttt{return(EXPR)}] \mbox{} \\ Retorna um valor.
+  
+\item[\texttt{break}, \texttt{skip}, \texttt{retry}] \mbox{} \\
+  Instruções de modulação de fluxo de controle local.  Do ponto de
+  vista da APT são semelhantes.
+  
+\item[\texttt{cond(CLAUSES)}] \mbox{} \\ Grupo de clausulas
+  condicionais (o ``if-then-else'' da linguagem).  \texttt{CLAUSES}
+  será posteriormente detalhado.
+  
+\item[\texttt{while(CLAUSES)}] \mbox{} \\ Ciclo while: estes ciclos
+  são ligeiramente mais poderosos que os tradicionais ciclos while de
+  outras linguagens de programação, pois estes permitem ter múltiplas
+  condições, entendo-se por condição de terminação do ciclo a
+  não-satisfacção de nenhuma dessas condições.  A estrutura é a mesma
+  do \texttt{cond}.
+  
+  A lista de clausulas tem a forma duma lista Prolog em que os
+  elementos podem ser:
+  \begin{description}
+  \item[\texttt{clause(EXPR, STAT)}] Para uma clausula ``normal'', com
+    uma guarda (a expressão booleana) e uma instrução (o statement).
+  \item[\texttt{clause(STAT)}] Para a clausula ``else'', em que a
+    instrução é incondicionalmente avaliada.
+  \end{description}
+  
+\item[\texttt{[STAT | STATS]}] \mbox{} \\ Lista de statements (ou
+  statement composto.)  Neste caso foi simplesmente usada o termo
+  lista do Prolog, por conveniência.
+
+\end{description}
+
+\section{Representação noutras linguagens}
+\label{sec:rep}
+
+Caso pretendamos representar a APT numa linguagem que não Prolog,
+basta criar tipos de dados que contenham a informação descrita
+anteriormente.  Caso estejamos a lidar com uma linguagem orientada a
+objectos, poderemos procurar modelar a taxonomia das entidades da
+linguagem como uma hierarquia de classes, com herança.
+
+\end{document}
+
+% $Log: apt-vspl.tex,v $
+% Revision 1.2  2010/03/26 07:35:57  spa
+% *** empty log message ***
+%
+% Revision 1.1  2009/03/19 00:35:30  spa
+% Initial revision
+%
+% Revision 1.6  2006/10/19 08:26:24  spa
+% versão 2006/07.
+%
+% Revision 1.5  2006/10/19 07:16:13  spa
+% *** empty log message ***
+%
+% Revision 1.4  2005/11/03 11:01:47  spa
+% *** empty log message ***
+%
+% Revision 1.3  2005/03/10 10:32:54  spa
+% update para 2004/05
+%
+% Revision 1.2  2002/11/07 12:51:49  spa
+% Versão inicial, distribuida hoje.  Faltam ainda umas coisas (statements nomeadamente)
+%
+% Revision 1.1  2002/10/24 08:58:33  spa
+% Initial revision
+%
+
+% Local Variables:
+% mode: latex
+% mode: font-lock
+% mode: auto-fill
+% End:

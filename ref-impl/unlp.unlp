@@ -1,0 +1,274 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%									      %
+%			          UNL Prolog				      %
+%									      %
+%									      %
+%				Rule Processing				      %
+%									      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%									      %
+%	by	Antonio Porto						      %
+%		Luis Trindade						      %
+%		Salvador Pinto Abreu					      %
+%									      %
+%	version 1.8					   3/23/88	      %
+%									      %
+%	(C)	GPLIA -							      %
+%		Grupo de Programacao em Logica e Inteligencia Artificial      %
+%									      %
+%		Departamento de Informatica				      %
+%		Universidade Nova de Lisboa				      %
+%		2825 Monte de Caparica					      %
+%		Portugal						      %
+%									      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+:- version('UNL Prolog (UNLP) Version 1.8 for Quintus Prolog
+Copyright (C) 1989 GPLIA -- FCT/UNL.').
+
+
+:- new_language(unlp, unlp_expand_term).
+
+
+:- op( 1200, xfx, <=  ).
+
+:- op( 1190, xfx, <-> ).
+:- op( 1190, xfx, <-  ).
+
+:- op( 999, xf , '!' ).
+:- op( 999, xf ,  #   ).
+
+:- op( 10,fx,@).
+:- op( 10,fx,@@).
+
+:- op(900, fy, (not)).
+:- op(900, fy, (once)).
+
+
+
+% -----------------------------------------------------------------------------
+%
+%		    Parse UNL Prolog to Edinburgh Prolog
+
+
+unlp_expand_term(T, C) !                               <= up_command(T, C).
+unlp_expand_term(T, C) <-> up_parse_to_ep(rule(H,B),C) <= up_parse_(T,H,B).
+
+
+
+% -----------------------------------------------------------------------------
+
+
+up_command((:-C), (:-C)) !.
+up_command((?-Q), (?-Q)) !.
+
+
+up_parse_((MH<=C), H, iff(C,B)	 ) <->  up_parse_iff(MH,H,B).
+up_parse_((H<-B),  H, if(B)	 ) !.
+up_parse_((H:-B),  H, ep(B,NB)   ) <->  up_parse_up_body(B,NB).
+up_parse_((L-->R), H, ep(B,NB)   ) <->  up_parse_dcg(R,L,H,B,NB).
+up_parse_(MH,	   H, iff(true,B)) ! <= up_parse_iff(MH,H,B).
+up_parse_(H,	   H, if(true)	 ) !.
+
+
+up_parse_iff((H<->B), H, B   ) !.
+up_parse_iff(H!,      H, true) !.
+up_parse_iff(H#,      H, fail) !.
+
+
+% -----------------------------------------------------------------------------
+%
+%			   Parsing Edinburgh Prolog
+
+
+up_parse_up_body(B, R) <-> up_parse_ep(B,RI), up_ep_body(RI,R).
+
+
+up_parse_ep(G,	 	  call(G) 	) ! <= var(G).
+up_parse_ep(call(G), 	  call(NG) 	) <->  up_parse_ep(G,NG).
+up_parse_ep((not G), 	  (not NG) 	) <->  up_parse_ep(G,NG).
+up_parse_ep(bagof(T,G,A), bagof(T,NG,A) ) <->  up_parse_ep(G,NG).
+up_parse_ep(setof(T,G,A), setof(T,NG,A) ) <->  up_parse_ep(G,NG).
+up_parse_ep((once G), 	  (once NG) 	) <->  up_parse_ep(G,NG).
+up_parse_ep((G1;G2),	  U		) <->  up_parse_ep(G1,U1), 
+					       up_parse_ep(G2,U2),
+					       up_or(U1,U2,U)
+					  <=   var(G1) . % arghhh!!!
+up_parse_ep((I->T;E),	  (NI->NT;NE)	) <->  up_parse_ep(I,NI), 
+					       up_parse_ep(T,NT), 
+					       up_parse_ep(E,NE).
+up_parse_ep((I->T),	  (NI->NT)	) <->  up_parse_ep(I,NI), 
+					       up_parse_ep(T,NT).
+up_parse_ep((G1,G2),	  U		) <->  up_parse_ep(G1,U1), 
+					       up_parse_ep(G2,U2), 
+				   	       up_and(U1,U2,U).
+up_parse_ep((G1;G2),	  U		) <->  up_parse_ep(G1,U1), 
+					       up_parse_ep(G2,U2),
+					       up_or(U1,U2,U). 
+up_parse_ep((!),	  iff(true,true)) !.
+up_parse_ep(G,		  G		) !.
+
+
+up_and(true,	      G,	     G 	            ) !.
+up_and(G,	      true,	     G 	            ) !.
+up_and(iff(C,B),      G,  	     iff(C,NB)      ) <->  up_and(B,G,NB).
+up_and(ciff(C,D1,D2), G,             ciff(C,ND1,ND2)) <->  up_and(D1,G,ND1),
+						           up_and(D2,G,ND2).
+up_and(ciff(D1,D2),   G,             ciff(ND1,ND2)  ) <->  up_and(D1,G,ND1),
+						           up_and(D2,G,ND2).
+up_and(if(B),         G,  	     BG       	    ) <->  up_and(B,G,BGI),
+							   up_ep_body(BGI,BG).
+up_and(G,	      iff(C,B),      iff(NC,B)      ) <->  up_and(G,C,NC).
+up_and(G,	      ciff(C,D1,D2), ciff(NC,D1,D2) ) <->  up_and(G,C,NC).
+up_and(G,	      ciff(D1,D2),   ciff(G,D1,D2)  ) <->  up_and(G,C,NC).
+up_and(G1,	      G2,	     (G1,G2)        ) !.
+
+
+up_or(fail, G,	  G 	     ) !.
+up_or(G,    fail, G	     ) !.
+up_or(G1,   Gn,	  ciff(D1,Dn)) <-> up_or(G1,Gn,D1,Dn) <= up_cut(G1) ;
+							 up_cut(Gn).
+up_or(G1,   G2,   (G1;G2)    ) !.
+
+up_or(ciff(D1,if(D2)), ciff(if(D3),D4), D1, ciff(if((D2;D3)),D4))  !.
+up_or(ciff(D1,if(D2)), G, 		D1, if((D2;G)))  !  <=   up_not_cut(G).
+up_or(G, 	       ciff(if(D1),D2), if((G;D1)), D2)  !  <=   up_not_cut(G).
+up_or(G1, G2, NG1, NG2) <-> up_ep_body(G1,NG1), up_ep_body(G2,NG2).
+
+
+up_ep_body(G, G    )  !  <=  up_cut(G).
+up_ep_body(G, if(G))  !.
+      
+
+up_not_cut(G) # <= up_cut(G).
+up_not_cut(G) !.
+
+
+up_cut(iff(_,_)   ) !.
+up_cut(ciff(_,_)  ) !.
+up_cut(ciff(_,_,_)) !.
+
+
+% -----------------------------------------------------------------------------
+%
+%			Parsing Definite Clause Grammars
+
+
+up_parse_dcg([], L, H, true, true) <-> expand_term((L-->[]), H).
+up_parse_dcg(R,  L, H, B,    NB  ) <-> expand_term((L-->R), (H:-B)),
+				       up_parse_up_body(B, NB).
+
+
+
+
+% -----------------------------------------------------------------------------
+%
+%		Parse from intermediate form to Edinburgh Prolog
+
+
+up_parse_to_ep(rule(H,ep(B,_)), (H:-B)) !.
+up_parse_to_ep(rule(H,B),       Clause) <-> up_parse_to_ep(B,H,Clause).
+
+
+% -----------------------------------------------------------------------------
+%
+%				Split unification
+
+
+up_parse_to_ep(B,H,C) <-> up_first_args(FA,A,LA), functor(H,P,N),
+			  up_get_pu(2,N,H,LA,PU), NH=..[P|A],
+			  up_put_pu(B,PU,NB),
+			  up_parse_to_ep(NB,NH,C)
+		      <=  arg(1,H,A1),
+			  nonvar(A1),
+			  A1={FA}.
+
+
+% -----------------------------------------------------------------------------
+
+
+up_first_args(A, [A1|A], LA) <-> up_first_args(An,A,LA,N)
+			     <=  nonvar(A), A=(A1,An).
+up_first_args(A, [A|LA], LA) !.
+
+
+up_get_pu(N,  N,H, [Gn],    Gn=Hn      ) <-> arg(N,H,Hn).
+up_get_pu(N1, N,H, [G1|Gn], (G1=H1,GHn)) <-> arg(N1,H,H1), N2 is N1+1,
+				             up_get_pu(N2,N,H,Gn,GHn).
+up_get_pu(_,  _,_, [],	    true       ) !.
+
+
+up_put_pu(if(B),    PU, if(NB)   ) <-> up_join(PU,B,NB).
+up_put_pu(iff(C,B), PU, iff(C,NB)) <-> up_join(PU,B,NB).
+
+
+% -----------------------------------------------------------------------------
+%
+%				  Grammar rule
+
+
+up_parse_to_ep(B,H,C) <-> up_g_rule(B,NB,L,NL),
+			  up_parse_to_ep(NB,NH,C)
+		      <=  up_nt(H,NH,L,NL).
+
+
+% -----------------------------------------------------------------------------
+
+
+up_nt(@G,  NG,L,NL) <-> G=..[F|A], up_app(A,[L,NL],NA), NG=..[F|NA].
+up_nt(@@G, NG,L,NL) <-> G=..[F|A], up_app(A,[NL],NA), NG=..[F,L|NA].
+
+
+up_g_rule(if(B),    if(NB),     L,NL) <-> up_xpnd(B,NB,L,NL).
+up_g_rule(iff(C,B), iff(NC,NB), L,NL) <-> up_xpnd(C,NC,L,IL),
+					  up_xpnd_(B,NB,IL,NL).
+
+
+up_xpnd(G,	 (up_xpnd(G,NG,L,NL),
+		  call(NG)),     L,	  NL) ! <= var(G).
+up_xpnd((G1,G2), NG12,		 L,	  NL) <-> up_xpnd(G1,NG1,L,IL),
+						  up_xpnd(G2,NG2,IL,NL),
+						  up_join(NG1,NG2,NG12).
+up_xpnd((G1;G2), (NG1;NG2),	 L,	  NL) <-> up_xpnd_(G1,NG1,L,NL),
+						  up_xpnd_(G2,NG2,L,NL).
+up_xpnd([T1|Tn], true,		 [T1|IL], NL) <-> up_app(Tn,NL,IL).
+up_xpnd({X},	 lex(T,X,IL,NL), [T|IL],  NL) !.
+up_xpnd(NT,	 NNT,		 L,	  NL) ! <= up_nt(NT,NNT,L,NL).
+up_xpnd(G,	 G,		 L,	  L ) !.
+
+
+up_xpnd_(G,NG,L,NL) <-> up_xpnd(G,IG,IL,NL),			%  always
+			( var(IL) -> NG=IG, L=IL		%  leave L
+				  ;  up_join(L=IL,IG,NG) ).	%  a free var
+
+
+% -----------------------------------------------------------------------------
+%
+%				 Normal rule
+
+
+up_parse_to_ep(if(True), H, H      ) ! <= nonvar(True), True=true.
+up_parse_to_ep(if(B),    H, (H:-B) ) !.
+up_parse_to_ep(iff(C,B), H, (H:-NB)) <-> up_join(!,B,CB), up_join(C,CB,NB).
+
+
+% -----------------------------------------------------------------------------
+%
+%			Join two goals into a conjunction
+
+
+up_join(True, G,    G      ) !		          <= nonvar(True), True=true.
+up_join(G,    True, G      ) !		          <= nonvar(True), True=true.
+up_join(G1n,  G,    (G1,NG)) <-> up_join(Gn,G,NG) <= nonvar(G1n), G1n=(G1,Gn).
+up_join(G1,   G2,   (G1,G2)) !.
+
+
+% -----------------------------------------------------------------------------
+%
+%			       Append two lists
+
+
+
+up_app([X1|Xn], Y, [X1|Z]) <-> up_app(Xn,Y,Z).
+up_app([],	   Y, Y	 ) !.

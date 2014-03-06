@@ -1,0 +1,51 @@
+.data
+.comm	_ackerValue,4
+.text
+LL0:	.align	2
+	.globl	_Ack
+.set	L31,0x0
+.data
+.text
+_Ack:	.word	L31
+	tstl	4(ap)
+	jneq	L35
+	addl3	$1,8(ap),r0
+	ret
+	.align	2
+L35:	tstl	8(ap)
+	jneq	L36
+	pushl	$1
+L2000001:	subl3	$1,4(ap),-(sp)
+	calls	$2,_Ack
+	ret
+	.align	2
+L36:	subl3	$1,8(ap),-(sp)
+	pushl	4(ap)
+	calls	$2,_Ack
+	pushl	r0
+	jbr	L2000001
+	.align	2
+	.globl	_main
+.data	1
+L43:.ascii	"running...\0"
+.text
+.data	1
+L45:.ascii	" done\72 %d\12\0"
+.text
+.set	L38,0x0
+.data
+.text
+_main:	.word	L38
+	pushal	L43
+	calls	$1,_printf
+	pushal	__iob+20
+	calls	$1,_fflush
+	pushl	$8
+	pushl	$3
+	calls	$2,_Ack
+	movl	r0,_ackerValue
+	pushl	r0
+	pushal	L45
+	calls	$2,_printf
+	ret
+

@@ -1,0 +1,36 @@
+.DATA
+x:	.WORD	123
+xpto:	.SPACE	20
+
+.TEXT
+program:
+	DUP           ; espaço r.v.
+	PUSH 2        ; arg 1: 2
+	PUSH -8       ; arg 2: a+3
+	LOCAL         ; endereço de a
+	LOAD          ; valor de a
+	PUSH 3        ; +3
+	ADD           ; (fim arg 2)
+	PUSH foobar   ; end. função
+	CALL          ; chama
+	POP           ; salta arg 2
+	POP           ; salta arg 1
+	PUSH x        ; endereço de x
+	STORE         ; guarda valor
+
+.TEXT
+foobar:
+	PUSH 0        ; zero variáveis locais
+	LINK          ; ...
+	PUSH 12       ; deslocamento de a
+	LOCAL         ; endereço de a
+	LOAD          ; valor de a
+	PUSH 8        ; deslocamento de b
+	LOCAL         ; endereço de b
+	LOAD          ; valor de b
+	ADD           ; a+b
+	PUSH 16       ; deslocamento de r.v.
+	LOCAL         ; endereço de r.v.
+	STORE         ; (r.v.) = a+b
+	UNLINK        ; desfaz stack frame
+	JUMP          ; retorna

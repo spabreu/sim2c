@@ -1,0 +1,12 @@
+Source: sim2c
+Section: unknown
+Priority: optional
+Maintainer: Salvador Abreu <spa@debian.org>
+Build-Depends: debhelper (>> 3.0.0)
+Standards-Version: 3.5.2
+
+Package: sim2c
+Architecture: all
+Depends: m4
+Description: A translator from the SiM-2002 assembler to C.
+ Sim2C compiles SiM-2002 assembler programs into portable C.

@@ -1,0 +1,27 @@
+Script started on Thu Dec  3 01:15:41 1987
+
+1:15am /usr/users/g249/spa/aulas/pc/sspl/0/x% ll acker*
+-rwxr-xr-x  1 spa         13312 Dec  3 01:09 acker
+-rw-r--r--  1 spa          1456 Dec  3 01:09 acker.as
+-rw-r--r--  1 spa          1492 Dec  2 21:23 acker.as-old
+-rw-r--r--  1 spa           604 Dec  3 01:09 acker.o
+-rw-r--r--  1 spa           275 Dec  3 01:08 acker.s
+-rw-r--r--  1 spa          2397 Dec  3 01:08 acker.so
+-rwxr-xr-x  1 spa          8192 Dec  3 01:03 acker_c
+-rw-r-----  1 spa           307 Dec  3 01:08 acker_c.c
+-rw-r--r--  1 spa           648 Dec  3 01:03 acker_c.s
+-rwxr-xr-x  1 spa         14336 Dec  2 20:06 acker_p
+-rw-r--r--  1 spa           383 Dec  2 19:58 acker_p.p
+-rw-r--r--  1 spa          1454 Dec  2 21:20 acker_p.s
+1:15am /usr/users/g249/spa/aulas/pc/sspl/0/x% time acker
+2045
+64.8u 0.8s 1:10 93% 15+96k 1+0io 0pf+0w
+1:17am /usr/users/g249/spa/aulas/pc/sspl/0/x% time acker_p
+      2045
+71.2u 1.0s 1:20 90% 15+258k 1+0io 0pf+0w
+1:18am /usr/users/g249/spa/aulas/pc/sspl/0/x% time acker_c
+running... done: 2045
+57.1u 1.5s 1:03 93% 7+98k 0+0io 0pf+0w
+1:20am /usr/users/g249/spa/aulas/pc/sspl/0/x% exit
+
+script done on Thu Dec  3 01:20:35 1987

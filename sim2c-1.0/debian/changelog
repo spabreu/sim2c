@@ -1,0 +1,19 @@
+sim2c (1.0-3) unstable; urgency=low
+
+  * Properly register .space labels as data!
+
+ -- Salvador Abreu <spa@debian.org>  Mon, 30 Dec 2002 00:10:33 +0000
+
+sim2c (1.0-2) unstable; urgency=low
+
+  * Added copyright.
+  * Make binary-indep instead of binary-arch.
+
+ -- Salvador Abreu <spa@debian.org>  Wed,  5 Jun 2002 11:25:43 +0100
+
+sim2c (1.0-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Salvador Abreu <spa@di.uevora.pt>  Wed,  5 Jun 2002 10:55:33 +0100
+

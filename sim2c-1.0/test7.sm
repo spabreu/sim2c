@@ -1,0 +1,18 @@
+.DATA
+x:    .WORD    123
+xpto:    .SPACE    20
+ar:    .SPACE    10
+
+.TEXT
+program:
+    PUSH 0
+    LINK
+    PUSH 9999
+    PUSH ar
+    STORE
+    PUSH ar
+    LOAD
+    PUSH print_int
+    CALL
+    UNLINK
+    JUMP

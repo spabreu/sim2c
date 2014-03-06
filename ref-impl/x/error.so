@@ -1,0 +1,22 @@
+_Tail ==> [real|_Tail].
+_Tail ==> [real|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+_Tail ==> [real|_Tail].
+[R,D|_Tail] ==> [map(D, R)|_Tail].
+_Tail ==> [id('b')|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+_Tail ==> [id('a')|_Tail].
+[H,T|_Tail] ==> [[H|T]|_Tail].
+[I|_Tail] ==> [decl_list(I, formal, T)|_Tail].
+_Tail ==> [[]|_Tail].
+[T|_Tail] ==> [decl(id('c'), formal, T)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+_Tail ==> [id('a')|_Tail].
+_Tail ==> [id('b')|_Tail].
+[B,A|_Tail] ==> [eq(A,B)|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[S,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V,T|_Tail] ==> [decl(id('junk'), const(V), T)|_Tail].

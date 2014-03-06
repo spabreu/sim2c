@@ -1,0 +1,110 @@
+_Tail ==> [decl(id('i'), formal, T)|_Tail].
+_Tail ==> [1|_Tail].
+_Tail ==> [id('i')|_Tail].
+_Tail ==> [lit(int, 0)|_Tail].
+[B,A|_Tail] ==> [lt(A,B)|_Tail].
+_Tail ==> [lit(int, 0)|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+_Tail ==> [id('i')|_Tail].
+_Tail ==> [lit(int, 0)|_Tail].
+[B,A|_Tail] ==> [eq(A,B)|_Tail].
+_Tail ==> [lit(int, 1)|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+_Tail ==> [id('i')|_Tail].
+_Tail ==> [id('fact')|_Tail].
+_Tail ==> [id('i')|_Tail].
+_Tail ==> [lit(int, 1)|_Tail].
+[B,A|_Tail] ==> [sub(A,B)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[B,A|_Tail] ==> [mul(A,B)|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[ES,S,E|_Tail] ==> [[clause(E, S),else(ES)]|_Tail].
+[Cs,S,E|_Tail] ==> [[clause(E, S)|Cs]|_Tail].
+[B,G|_Tail] ==> [cond(B, G)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[S,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('fact'), const(V), T)|_Tail].
+_Tail ==> [decl(id('i'), formal, T)|_Tail].
+_Tail ==> [id('res')|_Tail].
+_Tail ==> [lit(int, 1)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [id('k')|_Tail].
+_Tail ==> [id('i')|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [2|_Tail].
+_Tail ==> [id('k')|_Tail].
+_Tail ==> [lit(int, 0)|_Tail].
+[B,A|_Tail] ==> [gt(A,B)|_Tail].
+_Tail ==> [id('res')|_Tail].
+_Tail ==> [id('res')|_Tail].
+_Tail ==> [id('k')|_Tail].
+[B,A|_Tail] ==> [mul(A,B)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [id('k')|_Tail].
+_Tail ==> [id('k')|_Tail].
+_Tail ==> [lit(int, 1)|_Tail].
+[B,A|_Tail] ==> [sub(A,B)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[S,E|_Tail] ==> [[clause(E, S)]|_Tail].
+[B,G|_Tail] ==> [while(B, G)|_Tail].
+_Tail ==> [id('res')|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[S,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('ifact'), const(V), T)|_Tail].
+_Tail ==> [[]|_Tail].
+_Tail ==> [[]|_Tail].
+_Tail ==> [3|_Tail].
+_Tail ==> [id('readBool')|_Tail].
+_Tail ==> [[]|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('i')|_Tail].
+_Tail ==> [id('readInt')|_Tail].
+_Tail ==> [[]|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[B,A|_Tail] ==> [assign(A,B)|_Tail].
+_Tail ==> [id('writeInt')|_Tail].
+_Tail ==> [id('i')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeChar')|_Tail].
+_Tail ==> [lit(int, 10)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeInt')|_Tail].
+_Tail ==> [id('ifact')|_Tail].
+_Tail ==> [id('i')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeChar')|_Tail].
+_Tail ==> [lit(int, 32)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeInt')|_Tail].
+_Tail ==> [id('fact')|_Tail].
+_Tail ==> [id('i')|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+_Tail ==> [id('writeChar')|_Tail].
+_Tail ==> [lit(int, 10)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[S,E|_Tail] ==> [[clause(E, S)]|_Tail].
+[B,G|_Tail] ==> [while(B, G)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[S,TR,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('program'), const(V), T)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].
+[T,H|_Tail] ==> [[H|T]|_Tail].

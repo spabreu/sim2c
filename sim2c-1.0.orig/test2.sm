@@ -1,0 +1,127 @@
+	.data
+display:
+	.word 0        # base do display
+	.word 0        # display + 4
+	.word 0        # display + 8
+htop:
+	.word heap        # guarda o endereco da primeira livre
+heap:
+	.text        # comeca o programa
+	push _let_0
+	jump        # saltar o codigo das funcoes
+nfactor_1:              # codigo de funcao
+	push 4        # espaco p/ SL e indice(s) for
+	link
+	push display        # comeca SL in
+	push 8        # nivel actual x 4
+	add
+	dup        #  2 x o endereco dentro do display
+	load
+	push -4
+	local
+	store        # guarda o valor do display no SL
+	push 0
+	local        # calcula o FP
+	swap
+	store        # regista a FP no display, fim SL in
+	 	   # comeca If Then Else
+	push _then_1
+	 	   # comeca ==
+	push _neq_3
+	 	   # comeca IdExp
+	push 12        # deslocamento
+	local        # endereco na actual frame
+	load
+	 	   # fim de IdExp
+	push 0        # expressao inteira
+	sub
+	skipz
+	jump        # se nao sao iguais, para _neq_3
+	pop        # tira a label a mais
+	push 1
+	push _fimEQ_4
+	jump
+_neq_3:
+	push 0
+_fimEQ_4:              # fim de comp. ==
+	skipz
+	jump        # para a parte Then
+	pop        # comeca a parte Else
+	 	   # comeca mul
+	 	   # comeca IdExp
+	push 12        # deslocamento
+	local        # endereco na actual frame
+	load
+	 	   # fim de IdExp
+	 	   # comeca Function Call
+	 	   # comeca sub
+	 	   # comeca IdExp
+	push 12        # deslocamento
+	local        # endereco na actual frame
+	load
+	 	   # fim de IdExp
+	push 1        # expressao inteira
+	sub        # arithmetic exp
+	dup        # espaco para o valor de retorno
+	push nfactor_1        # label: nome da funcao e ID unico
+	call
+	swap
+	pop        # retira args
+	 	   # fim de Function Call
+	mul        # arithmetic exp
+	push _fimIF_2
+	jump
+_then_1:
+	push 1        # expressao inteira
+_fimIF_2:              # fim de If Then Else
+	push 8
+	local
+	store        # copia o resultado para V.R.
+	push -4
+	local
+	load        # le o SL
+	push display
+	push 8        # nivel actual x 4
+	add
+	store        # guarda o valor do SL no display
+	unlink        # termina a frame da funcao
+	jump
+_let_0:
+	push 0        # espaco para retornar
+	push 4        # espaco p/ SL, locais e indice(s) for
+	link
+	push display        # comeca SL in
+	push 4        # nivel actual x 4
+	add
+	dup        #  2 x o endereco dentro do display
+	load
+	push -4
+	local
+	store        # guarda o valor do display no SL
+	push 0
+	local        # calcula o FP
+	swap
+	store        # regista a FP no display, fim SL in
+	 	   # inicializa as variaveis locais
+	 	   # corpo do let
+	 	   # comeca ExpSeq
+	 	   # comeca Function Call
+	push 10        # expressao inteira
+	dup        # espaco para o valor de retorno
+	push nfactor_1        # label: nome da funcao e ID unico
+	call
+	swap
+	pop        # retira args
+	 	   # fim de Function Call
+	 	   # fim de ExpSeq
+	push 4
+	local
+	store        # copia o resultado para V.R.
+	push -4
+	local
+	load        # le o SL
+	push display
+	push 4        # nivel actual x 4
+	add
+	store        # guarda o valor do SL no display
+	unlink        # termina a frame do let

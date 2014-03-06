@@ -1,0 +1,8 @@
+_Tail ==> [[]|_Tail].
+_Tail ==> [bool|_Tail].
+_Tail ==> [id('writeChar')|_Tail].
+_Tail ==> [lit(int, 7)|_Tail].
+[B,A|_Tail] ==> [map(A,B)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[S,TR,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('program'), const(V), T)|_Tail].

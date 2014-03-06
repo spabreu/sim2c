@@ -1,0 +1,13 @@
+_Tail ==> [id('b')|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+_Tail ==> [id('a')|_Tail].
+[H,T|_Tail] ==> [[H|T]|_Tail].
+[I|_Tail] ==> [decl_list(I, formal, T)|_Tail].
+_Tail ==> [int|_Tail].
+_Tail ==> [id('a')|_Tail].
+_Tail ==> [id('b')|_Tail].
+[B,A|_Tail] ==> [add(A,B)|_Tail].
+[E|_Tail] ==> [return(E)|_Tail].
+[T|_Tail] ==> [[T]|_Tail].
+[S,TR,F|_Tail] ==> [lit(map(TF,TR), map(F,S,Symbols))|_Tail].
+[V|_Tail] ==> [decl(id('sum'), const(V), T)|_Tail].

@@ -13,15 +13,15 @@
 #define MEM_SZ ((DATA_SZ) + (HEAP_SZ) + (STACK_SZ))
 
 union {
-  long mem[0];
+  int mem[0];
   struct {
-    long m_x;
-    long m_xpto[20];
+    int m_x;
+    int m_xpto[20];
   } named;
   struct {
-    long z_data[DATA_SZ];
-    long z_heap[HEAP_SZ];
-    long z_stack[STACK_SZ];
+    int z_data[DATA_SZ];
+    int z_heap[HEAP_SZ];
+    int z_stack[STACK_SZ];
   } zone;
 } global;
 
@@ -30,21 +30,21 @@ union {
 #define HEAP   global.zone.z_heap
 #define STACK  global.zone.z_stack
 
-long SP = MEM_SZ;
-long FP = 0;
-long SR;
+int SP = MEM_SZ;
+int FP = 0;
+int SR;
 void *PC;				// (unused)
 
 // -- Names for global variables ----------------------------------------------
 
-#define GV_x ((long *) &global.named.m_x - (long *) &global.named)
-#define GV_xpto ((long *) &global.named.m_xpto - (long *) &global.named)
+#define GV_x ((int *) &global.named.m_x - (int *) &global.named)
+#define GV_xpto ((int *) &global.named.m_xpto - (int *) &global.named)
 
 // == Program =================================================================
 
 int main (int argc, char *argv[])
 {
-  long i;
+  int i;
 
 // -- Initialization ----------------------------------------------------------
   global.named.m_x = 123;
@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
 	goto lib_init;			// skip library code!
 
 print_int:				// print_int (int) -> ()
-	printf ("%ld\n", M[SP+1]);
+	printf ("%d\n", M[SP+1]);
 	goto * ((void *) M[SP++]);
 
 print_char:				// print_char (int) -> ()
@@ -76,9 +76,9 @@ halt:					// halt () -> ()
 dump_regs:				// dump_regs () -> ()
 	{
 	  printf ("-- Register dump --\n");
-	  printf ("SP = 0x%x (%d)\n", (long) SP, (long) SP);
-	  printf ("FP = 0x%x (%d)\n", (long) FP, (long) FP);
-	  printf ("SR = 0x%x (%d)\n", (long) SR, (long) SR);
+	  printf ("SP = 0x%x (%d)\n", (int) SP, (int) SP);
+	  printf ("FP = 0x%x (%d)\n", (int) FP, (int) FP);
+	  printf ("SR = 0x%x (%d)\n", (int) SR, (int) SR);
 	  printf ("PC = (unused)\n");
 	}
 	goto * ((void *) M[SP++]);
@@ -108,7 +108,7 @@ lib_init:
 	}
 
 // -- Start execution ---------------------------------------------------------
-  M[--SP] = (long) &&L_exit_program; // Save return address for main program
+  M[--SP] = (int) &&L_exit_program; // Save return address for main program
   goto program;			// start kicking...
 L_exit_program:			// Return here, and...
   exit (0);			// quit.
@@ -117,10 +117,10 @@ L_exit_program:			// Return here, and...
 // -- Instructions ------------------------------------------------------------
 program:
 	M[--SP] = 0;	// PUSH 0
-	{ long N = M[SP]; M[SP]= FP; FP=SP+1; SP -= N; } // LINK
+	{ int N = M[SP]; M[SP]= FP; FP=SP+1; SP -= N; } // LINK
 	M[--SP] = 12;	// PUSH 12
-	M[--SP] = (long) &&print_int;	// PUSH print_int
-	{ void *C = (void *) M[SP]; M[SP]=(long)&&P_6; goto *C; } // CALL
+	M[--SP] = (int) &&print_int;	// PUSH print_int
+	{ void *C = (void *) M[SP]; M[SP]=(int)&&P_6; goto *C; } // CALL
 P_6:	SP=FP; FP=M[SP-1];		// UNLINK
 	goto * ((void *) M[SP++]);		// JUMP
 

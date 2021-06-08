@@ -72,12 +72,12 @@ _define_(`store', `_np_	M[M[SP]] = M[SP+1]; SP += 2;	// STORE')
 
 _define_(`skipz', `_np_	if (! M[SP++]) goto _pc_at_(2);	// SKIPZ')
 _define_(`jump',  `_np_	goto * ((void *) M[SP++]);		// JUMP')
-_define_(`call',  `_np_	{ void *C = (void *) M[SP]; M[SP]=(int)&&_pc_at_(1); goto *C; } // CALL')
+_define_(`call',  `_np_	{ void *C = (void *) M[SP]; M[SP]=(long)&&_pc_at_(1); goto *C; } // CALL')
 
 _define_(`local', `_np_	M[SP] = M[SP] + FP;		// LOCAL')
 _define_(`stack', `_np_ M[SP] = M[SP] + SP;		// STACK')
 
-_define_(`link',  `_np_	{ int N = M[SP]; M[SP]= FP; FP=SP+1; SP -= N; } // LINK')
+_define_(`link',  `_np_	{ long N = M[SP]; M[SP]= FP; FP=SP+1; SP -= N; } // LINK')
 _define_(`unlink', `_np_	SP=FP; FP=M[SP-1];		// UNLINK')
 
 _define_(`dup_sr', `_np_	SR = M[SP];			// DUP_SR')
@@ -90,27 +90,27 @@ _ifelse_(_regexp_($1,`^[-0-9]'), 0, `_dnl_
 $1', `_dnl_				   -- Numbers go untouched ------------
 _ifdef_(`_DATA_'$1,_dnl_
 _DATA_`'$1,_dnl_			   -- (known) data labels -------------
-(int) &&$1`'_dnl_			   -- code labels ---------------------
+(long) &&$1`'_dnl_			   -- code labels ---------------------
 )')')
 
 _define_(`label', `_dnl_
 _ifelse_(_data_text_,__data__,_dnl_
-`    int m_`'$1[0];		// data `label' for "$1"_dnl_
+`    long m_`'$1[0];		// data `label' for "$1"_dnl_
 _define_(`_DATA_'$1,`GV_'$1)_global_var_($1)',_dnl_
 `$1:')')
 
 _define_(`_ac_',0)
 _define_(`_anon_', `_define_(`_ac_',_incr_(_ac_))_format_(`a_%04.4d',_ac_)')
 
-_define_(`_word_',`    int _anon_;_divert_(4)_dnl_
+_define_(`_word_',`    long _anon_;_divert_(4)_dnl_
   global.named._format_(`a_%04.4d',_ac_) = _initializer_($1);
 _divert_(1)')
 
-_define_(`_def_word_',  `    int m_$1;_dnl_
+_define_(`_def_word_',  `    long m_$1;_dnl_
 _divert_(4)  global.named.m_$1 = _initializer_($2);
 _define_(`_DATA_'$1,`GV_'$1)_global_var_($1)')
 
-_define_(`_def_space_', `    int m_$1[$2];_dnl_
+_define_(`_def_space_', `    long m_$1[$2];_dnl_
 _divert_(4)  for (i=0; i<$2; ++i) global.named.m_$1[i] = 0;
 _define_(`_DATA_'$1,`GV_'$1)_global_var_($1)')
 
@@ -118,7 +118,7 @@ _define_(`_initializer_',`_dnl_
 _ifelse_(_regexp_($1,`^[-0-9]'), 0, `$1', `GV_`'$1')')
 
 _define_(`_global_var_',`_divert_(3)_dnl_
-#define GV_$1 ((int *) &global.named.m_$1 - (int *) &global.named)
+#define GV_$1 ((long *) &global.named.m_$1 - (long *) &global.named)
 _divert_(1)')
 
 _define_(`_data_', `_divert_(1)_define_(`_data_text_', __data__)')
@@ -138,14 +138,14 @@ _define_(`_dumpdata_', `
 #define MEM_SZ ((DATA_SZ) + (HEAP_SZ) + (STACK_SZ))
 
 union {
-  int mem[0];
+  long mem[0];
   struct {_dnl_
 _undivert_(1)_dnl_
   } named;
   struct {
-    int z_data[DATA_SZ];
-    int z_heap[HEAP_SZ];
-    int z_stack[STACK_SZ];
+    long z_data[DATA_SZ];
+    long z_heap[HEAP_SZ];
+    long z_stack[STACK_SZ];
   } zone;
 } global;
 
@@ -154,9 +154,9 @@ _undivert_(1)_dnl_
 #define HEAP   global.zone.z_heap
 #define STACK  global.zone.z_stack
 
-int SP = MEM_SZ;
-int FP = 0;
-int SR;
+long SP = MEM_SZ;
+long FP = 0;
+long SR;
 void *PC;				// (unused)
 
 // -- Names for global variables ----------------------------------------------
@@ -168,7 +168,7 @@ _define_(`_dumptext_', `_dnl_
 
 int main (int argc, char *argv[])
 {
-  int i;
+  long i;
 
 // -- Initialization ----------------------------------------------------------
 _undivert_(4)_dnl_
@@ -178,7 +178,7 @@ _undivert_(4)_dnl_
 _include_(LIBDIR/library.m4)_dnl_
 
 // -- Start execution ---------------------------------------------------------
-  M[--SP] = (int) &&L_exit_program; // Save return address for main program
+  M[--SP] = (long) &&L_exit_program; // Save return address for main program
   goto program;			// start kicking...
 L_exit_program:			// Return here, and...
   exit (0);			// quit.

@@ -9,7 +9,7 @@ _divert_(0)_dnl_
 	goto lib_init;			// skip library code!
 
 print_int:				// print_int (int) -> ()
-	printf ("%d\n", M[SP+1]);
+	printf ("%ld\n", M[SP+1]);
 	goto * ((void *) M[SP++]);
 
 print_char:				// print_char (int) -> ()
@@ -17,7 +17,7 @@ print_char:				// print_char (int) -> ()
 	goto * ((void *) M[SP++]);
 
 read_int:				// read_int () -> int
-	scanf ("%d", &M[SP+1]);
+	scanf ("%ld", &M[SP+1]);
 	goto * ((void *) M[SP++]);
 
 read_char:				// read_char () -> int
@@ -30,9 +30,9 @@ halt:					// halt () -> ()
 dump_regs:				// dump_regs () -> ()
 	{
 	  printf ("-- Register dump --\n");
-	  printf ("SP = 0x%x (%d)\n", (int) SP, (int) SP);
-	  printf ("FP = 0x%x (%d)\n", (int) FP, (int) FP);
-	  printf ("SR = 0x%x (%d)\n", (int) SR, (int) SR);
+	  printf ("SP = 0x%lx (%ld)\n", (long) SP, (long) SP);
+	  printf ("FP = 0x%lx (%ld)\n", (long) FP, (long) FP);
+	  printf ("SR = 0x%lx (%ld)\n", (long) SR, (long) SR);
 	  printf ("PC = (unused)\n");
 	}
 	goto * ((void *) M[SP++]);
